@@ -13,6 +13,7 @@ These are things we've learned about hosting CTF web challenges using Google Clo
 - It is easiest if your web application requires no server-side session/state.
   - With some effort, you can set up a Cloud Run service to talk to a Google-hosted REDIS instance but it is well worth some effort to see if you can avoid the need for this.
   - For example, you might be able to keep the entire session state in a Cookie using something like JWT.
+- These steps were done on a Mac.  YMMV
 
 ## What Should I Do First?
 
@@ -28,10 +29,14 @@ These are things we've learned about hosting CTF web challenges using Google Clo
   - Inside such a "project" is where you will do everything related to your CTF challenge hosting.
   - You can create multiple projects if you like, but the things you do inside one will not affect or be seen by the other. 
 - [Install the gcloud CLI (command line interface)](https://cloud.google.com/sdk/docs/install) onto your computer.
-  - As we progress in the instructions, you'll see that you can often set up something in GCP just by using the Web UI.  However, it is well worth getting used to the gcloud CLI since it allow for easier automation such as with bash scripts. 
+  - As we progress in the instructions, you'll see that you can often set up something in GCP just by using the Web UI.  However, it is well worth getting used to the gcloud CLI since it allows for easier automation such as with bash scripts. 
   - At some point you'll run `gloud init`.  This is where you will:
     - authenticate gcloud so that it has permissions to "talk to" your GCP project
     - select which "project" you want gcloud to talk to by default (it is easy to switch between projects and even between multiple google accounts if needed)
+
+For this tutorial, I created this project:
+
+![](media/gcp-project-page.png)
 
 ## My First Web Challenge
 
@@ -64,7 +69,7 @@ Here are the files that make up the source of the challenge app.
 ```
 
 [package-lock.json]
-This file is created automatically when you first run `npm install` (see below).  You generally do want this file to be under source control.
+This file is created automatically when you first run `npm install` (see below).  You generally want this file to be under source control.
 
 
 [index.js]
@@ -144,7 +149,7 @@ You can press `Control+C` in the terminal window to stop the application.
 
 ### Run the Challenge Using Docker
 
-In order to container our challenge application, we'll need a `Dockerfile`.
+In order to containerize our challenge application, we'll need a `Dockerfile`.
 
 [Dockerfile]
 ```
@@ -298,6 +303,130 @@ To stop the application, you can use the Docker Dashboard UI or run this command
 
 `docker stop fun-app`
 
-**Note**: You might be also able to stop the application by pressing `Control+C` in the terminal window you used to start it. However, I'm not certain this is guaranteed to always work.
+**Note**: You might be able to stop the application by pressing `Control+C` in the terminal window you used to start it. However, I'm not certain this is guaranteed to always work.
 
+
+## Deploy the Image to Google Container Registry
+
+We now want to upload our Docker image into Google Container Registry.
+
+### Container Registry Web UI
+
+The menu on the left of the GCP web UI has lots of items.  Just keep scrolling down until you find it here:
+
+![img.png](media/container-registry-menu.png)
+
+We recommend pinning that item so it'll appear for you at the top of the menu.
+
+When you click it, you'll see a page like this with no items in the table yet.
+
+![img.png](media/container-registry-page-no-items.png)
+
+### Allow docker to "push" to Container Registry
+
+In order to get our web docker image into Google Container Registry we need to setup docker to be allowed to "push" to it.
+
+[These instructions](https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper) will help you.
+
+First run this: `gcloud auth login`
+
+This will open the browser and allow to select the google account you want to use.  It'll then ask you to confirm the permissions that gcloud needs.
+
+Next run this: `gcloud auth configure-docker`
+
+This will setup docker to be able to push to your project's container registry.  You might see output like:
+
+```
+{
+  "credHelpers": {
+    "gcr.io": "gcloud",
+    "us.gcr.io": "gcloud",
+    "eu.gcr.io": "gcloud",
+    "asia.gcr.io": "gcloud",
+    "staging-k8s.gcr.io": "gcloud",
+    "marketplace.gcr.io": "gcloud"
+  }
+}
+Adding credentials for all GCR repositories.
+```
+
+You'll notice the above content in your `~/.docker/config.json` file.
+
+
+### Tag and Push the Image
+
+Run this command to "tag" the image as being associated with your GCP project.
+
+`docker tag my-first-web-challenge:1.0 gcr.io/thermal-wonder-338201/my-first-web-challenge:1.0`
+
+The syntax here is:
+
+docker tag <local-image-name>:<local-image-tag> gcr.io/<your-gcp-project-identifier>/<local-image-name>:<local-image-tag>
+
+This should run immediately and produce no output.
+
+To verify it actually did something run: `docker images`
+
+You'll see something like:
+
+```
+REPOSITORY                                            TAG       IMAGE ID       CREATED        SIZE
+my-first-web-challenge                                1.0       4cc2c043a381   22 hours ago   920MB
+gcr.io/thermal-wonder-338201/my-first-web-challenge   1.0       4cc2c043a381   22 hours ago   920MB
+```
+
+Now we can ask docker to "push" this image to Google Container Registry:
+
+`docker push gcr.io/thermal-wonder-338201/my-first-web-challenge:1.0`
+
+You might see output like this:
+
+````
+The push refers to repository [gcr.io/thermal-wonder-338201/my-first-web-challenge]
+0e4e990a5801: Pushed
+e46d8f847897: Pushed
+6028c55a5a49: Pushed
+c794aac0a94c: Pushed
+87dc0d8d7ee7: Pushed
+5f70bf18a086: Layer already exists
+50ed79383d91: Pushed
+cba7f369883f: Layer already exists
+46b21d2f25ec: Layer already exists
+0fb7df40bb5b: Layer already exists
+c26a5692b560: Layer already exists
+0cd41aa80b1f: Layer already exists
+7a6d0f54488f: Layer already exists
+6ef8823b489f: Layer already exists
+9578c16f3f7c: Layer already exists
+3141322c5cdb: Layer already exists
+1.0: digest: sha256:0ce5d03ccd5309e28c212348a74e3bc7f438881a16baeedf5398b0c0a0902570 size: 3668
+````
+
+### Viewing the Image in Container Registry
+
+If you refresh your Container Registry web page, you should now see your pushed iage:
+
+![](media/container-registry-page-one-item.png)
+
+If you click on the image name, you are brought to a detail page like this:
+
+![](media/container-registry-drill.png)
+
+**Note**: You can build newer images with updated tags like `1.1` or `2.0` and run through the above steps with them as well.  They'll appear as new rows inside the details page for that image.
+
+## Creating your first Google Cloud Run Service
+
+Now that we have an image uploaded to Container Registry, we can create our first real web application inside Cloud Run.
+
+First we'll do it via the web ui and later learn how to do it using the gcloud CLI.
+
+Find the Cloud Run menu item in the large menu on the left.  Again, we suggest pinning it so it stays at the top.
+
+![](media/cloud-run-menu.png)
+
+Open the Cloud Run web ui and you'll see you have no Services defined yet:
+
+![](media/cloud-run-page-empty.png)
+
+Start defining a service by clicking the **CREATE SERVICE** link.
 
