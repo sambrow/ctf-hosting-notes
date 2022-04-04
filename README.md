@@ -172,9 +172,9 @@ docker-compose.yml
 node_modules
 ```
 
-It is not our intention to teach you Docker but a couple items here is worth pointing out.
+It is not our intention to teach you Docker but a couple items here are worth pointing out.
 
-Note that the `EXPOSE 8000` line is purely decorative.  Docker completely ignores it.  It is mainly there to help to reader know that the application will be listening on a certain port.
+Note that the `EXPOSE 8000` line is purely decorative.  Docker completely ignores it.  It is mainly there to help the reader know that the application will be listening on a certain port.
 
 Also, notice this copies the `package.json` and `package-lock.json` files and then runs `npm install`.
 
@@ -186,9 +186,9 @@ Because Docker keeps track of the state of your image after every line of the Do
 
 If you are rebuilding an image and Docker can convince itself that all the inputs up to a certain line have not changed, then it'll skip those steps and just use its cached status.
 
-So, if you copied everything up front, then any edit your make to `index.js` or `index.html` will cause `npm install` to re-run when you build the image.
+So, if you copied everything up front, then any edit you make to `index.js` or `index.html` will cause `npm install` to re-run when you build the image.
 
-In contrast, in the above `Dockerfile`, edits to these files will not cause npm install to run because none of the files cited before that line will have changed.
+In contrast, in the above `Dockerfile`, edits to these files will not cause `npm install` to run because none of the files cited before that line will have changed.
 
 
 
@@ -298,6 +298,6 @@ To stop the application, you can use the Docker Dashboard UI or run this command
 
 `docker stop fun-app`
 
-Note: You might be also able to stop the application by pressing Control+C in the terminal window you used to start it. However, I'm not certain this is guaranteed to always work.
+**Note**: You might be also able to stop the application by pressing `Control+C` in the terminal window you used to start it. However, I'm not certain this is guaranteed to always work.
 
 
