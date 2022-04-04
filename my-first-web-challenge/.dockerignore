@@ -1,0 +1,4 @@
+# files to not include in the image
+Dockerfile
+docker-compose.yml
+node_modules
