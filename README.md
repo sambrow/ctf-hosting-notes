@@ -330,7 +330,7 @@ In order to get our web docker image into Google Container Registry we need to s
 
 First run this: `gcloud auth login`
 
-This will open the browser and allow to select the google account you want to use.  It'll then ask you to confirm the permissions that gcloud needs.
+This will open the browser and allow you to select the google account you want to use.  It'll then ask you to confirm the permissions that gcloud needs.
 
 Next run this: `gcloud auth configure-docker`
 
@@ -429,4 +429,149 @@ Open the Cloud Run web ui and you'll see you have no Services defined yet:
 ![](media/cloud-run-page-empty.png)
 
 Start defining a service by clicking the **CREATE SERVICE** link.
+
+The first item we specify is the image/revision we want to use.  Click the SELECT link here:
+
+![](media/create-service-select.png)
+
+A list of your items from the Container Registry will appear on the right. Select the one you want:
+
+![](media/create-service-image-selected.png)
+
+For the next several choices, we'll accept the defaults.
+
+However, we have to decide whether to allow unauthenticated access.  For a CTF, that is exactly what we want:
+
+![](media/create-service-first-several-items.png)
+
+Some minor notes on these items:
+
+- CPU allocation and pricing:
+  - We left this at the default "CPU is only allocated during request processing".
+  - In our experience, this worked fine and it is cheaper as well.
+- Autoscaling:
+  - min = 0, max = 100
+  - When nobody is accessing your challenge Google will spin down all your instances to save money/resources.
+  - If your challenge starts getting traffic, it will spin some back up.
+  - If it gets a LOT of traffic, it will spin up even more instances.  It has a default heuristic that is fine but you can teak it as you'll see later.
+  - If you have a web challenge where the timing of the request/response is important, you might consider setting min and max to the same value.
+  - We had a couple challenges like this and set min = max = 10.  This ensures no users will see the delay caused by Cloud Run spinning up a new instance.
+- Ingress:
+  - Allow all traffic
+  - not sure when you'd use the other choices here
+- Authentication
+  - Allow unauthenticated invocations
+  - That's exactly what we want for a CTF challenge.
+
+
+At the bottom is a **Containers, Variables & Secrets, Connections, Security** section.  Expand this.
+
+The default connection port is `8080` and you'll want to change it to be `8000` for this example.
+
+![](media/create-service-container-port.png)
+
+You can leave the next couple fields blank.
+
+Next you enter the **Capacity** details:
+
+![](media/create-service-capacity.png)
+
+For most CTF web challenges I can think of you can likely go with the defaults.
+I did increase the memory and CPUs in a challenge that used Puppeteer to invoke a headless version of Chrome.
+
+We suggest you test out your challenge under some reasonable load to ensure you won't be surprised when your CTF opens.  Such testing is outside the scope of this document.
+
+Here is where you can tweak the **Max requests per container**.
+
+If more than this many simulaneous requests come in, then Cloud Run will spin up new instances as needed to keep the load per instance less than this.
+
+Again, I've only reduced this in the case where the challenge invoked a headless Chrome.
+
+Finally, select your desired **Execution environment**
+
+![](media/create-service-execution-environment.png)
+
+I think most web challenges will do fine with the "First generation".
+
+I suggest only switching to the "Second generation" if you notice some issue.
+
+
+## Hold Up!
+
+Before you click **CREATE** to create your first Cloud Run Service, take a moment and notice the **SHOW COMMAND LINE** link at the upper right of the web page.
+
+Go ahead and click that and you'll see:
+
+![](media/create-service-show-command-line.png)
+
+Save that command line away for later reference:
+
+```
+gcloud run deploy my-first-web-challenge \
+--image=gcr.io/thermal-wonder-338201/my-first-web-challenge@sha256:0ce5d03ccd5309e28c212348a74e3bc7f438881a16baeedf5398b0c0a0902570 \
+--allow-unauthenticated \
+--port=8000 \
+--service-account=726894497722-compute@developer.gserviceaccount.com \
+--platform=managed \
+--region=us-central1 \
+--project=thermal-wonder-338201
+```
+
+Notice that since we mostly took the defaults, there are not that many options.  If we had varied from the defaults, this command line would then specify more things.
+
+## Back to the show
+
+Ok, now dismiss the pane on the right and click the **CREATE** button.
+
+This will display some in-progress status as it does the work:
+
+![](media/create-service-create1.png)
+
+Internally, it will create an instance of your challenge and verify that it is actually listening on the port (8000) that you specified.
+
+If there is any issue, you'll see an explanatory error,
+
+After it finishes, you'll see something like this:
+
+![](media/create-service-create2.png)
+
+
+Notice at the top there is a **URL** for your app like: 
+
+[https://my-first-web-challenge-znhlm3c47a-uc.a.run.app/](https://my-first-web-challenge-znhlm3c47a-uc.a.run.app/)
+
+You can see this link uses `https://`.  There is no support for `http://`.
+
+Also notice the domain name starts with the name of your image.
+
+The remainder of the domain name is some unique characters followed by the rest of the domain.
+
+This URL will remain stable as long as you keep the same docker image name.  The unique part is specific to your current project.
+
+If you push another web challenge image with a different name and create a Cloud Run service from it, you'll get a similar-looking URL that starts with that image's name and the rest will be identical to your first URL.
+
+Let's click the link and see our app!
+
+![](media/my-first-web-challenge-in-cloud-run.png)
+
+
+## Reminder about session and instances
+
+Cloud Run will route incoming requests to your application and spin up new instances as needed if the load becomes heavy.
+
+A naive approach at keeping session state in a global variable will fail since the instances are ephemeral and any given user might get routed to instance 1 and later to instance 7 where the global variable value in instance 1 is not to be found.
+
+You might think you could set min = max = 1 and THEN use global variables to manage some kind of session state.
+
+This would also be dangerous since Cloud Run is free to spin down your instance and spin up a new one in its place any time it likes.
+
+If your challenge does need session state, a good first try is to manage it in client-side cookies using something like JWT (JSON Web Token).
+
+The details are beyond the scope of this article.
+
+If you need "real" session storage, it is possible to get a Cloud Run application to talk to a REDIS instance.
+
+Here is at least [one article](https://medium.com/google-cloud/using-memorystore-with-cloud-run-82e3d61df016) that might help you.
+
+
 
