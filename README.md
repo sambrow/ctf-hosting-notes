@@ -574,4 +574,116 @@ If you need "real" session storage, it is possible to get a Cloud Run applicatio
 Here is at least [one article](https://medium.com/google-cloud/using-memorystore-with-cloud-run-82e3d61df016) that might help you.
 
 
+## Taking Down the Web Challenge
+
+To stop the web challenge, you need to select it in the Services web page and then click the DELETE icon at the top.
+
+As far as we know, there is no "pause service" feature.
+
+To start it again, you can repeat the earlier steps to create the service over again.  If you use the same image from the Container Registry, your challenge URL will be unchanged.
+
+**Note:** This is where it is very useful to use the gcloud CLI.  Once you delete a Service, you can easily re-create it by just running the same gcloud command you used earlier.
+
+
+## gcloud CLI
+
+In an earlier step, you saved off the command line to create a service.  If you delete the Service and want to re-create it, it is likely easier to use the saved command:
+
+```
+gcloud run deploy my-first-web-challenge \
+--image=gcr.io/thermal-wonder-338201/my-first-web-challenge@sha256:0ce5d03ccd5309e28c212348a74e3bc7f438881a16baeedf5398b0c0a0902570 \
+--allow-unauthenticated \
+--port=8000 \
+--service-account=726894497722-compute@developer.gserviceaccount.com \
+--platform=managed \
+--region=us-central1 \
+--project=thermal-wonder-338201
+```
+
+
+To see a list of your Services:
+
+`gcloud run services list`
+
+possible output:
+
+```
+   SERVICE                 REGION       URL                                                     LAST DEPLOYED BY    LAST DEPLOYED AT
+✔  my-first-web-challenge  us-central1  https://my-first-web-challenge-znhlm3c47a-uc.a.run.app  ????????@gmail.com  2022-04-04T23:50:44.869891Z
+```
+
+
+To delete a running Service:
+
+`gcloud run services delete my-first-web-challenge --region=us-central1 --project=thermal-wonder-338201`
+
+This will ask for confirmation.
+
+If you want it to just do it without confirming, you can add the `-q` option.
+
+`gcloud run services delete my-first-web-challenge -q --region=us-central1 --project=thermal-wonder-338201`
+
+
+If you are working with a group of web challenges, it is likely best to setup shell scripts:
+
+- one to start them all
+- one to stop them all
+
+
+## Solvers
+
+We strongly recommend creating solvers for your web challenges.  We usually do this in python using the requests package to make http requests.
+
+You can then create another shell script that runs all your solvers to prove your challenges are all in a good state.
+
+## Logs
+
+If your web challenges writes to stdout, GCP will let you view such output in the web UI.
+
+On the Services page, you can see your list of running challenges.
+
+Clicking one of these will bring you to the METRICS page for that challenge.
+
+You can then click the LOGS tab to access these logs.
+
+You can use the Filter feature to filter down to just lines containing specified text.
+
+## Dashboards
+
+In the GCP menu on the left, select Monitoring and then Dashboards:
+
+![](media/monitoring-dashboard-menu.png)
+
+Note: Before proceeding, be sure to generate "some" traffic to your challenge.  A few page loads should be enough.  By default the web UI only offers you metrics that have data.  By visiting the page, you'll generate some data for the metric we want.
+
+Click CREATE DASHBOARD:
+
+![](media/dashboard-create.png)
+
+Give your dashboard a name and then click the Line entry from the Chart Library:
+
+![](media/dashboard-set-name.png)
+
+Open up the **Resource & Metric** dropdown and select Cloud Run Revision:
+
+![](media/dashboard-resource-and-metric1.png)
+
+From the ACTIVE METRIC CATEGORIES, select **Request_count** and then from ACTIVE METRICS select **Request Count**:
+
+![](media/dashboard-request-count.png)
+
+
+Then click APPLY.
+
+You should now see this widget appear in your dashboard:
+
+![](media/dashboard-widget-request-count.png)
+
+Using this web UI, you can change the interval of time shown in your widget.
+
+If you have multiple web challenges, traffic for all of them will appear in this one widget where each challenge is a different color.
+
+There are MANY other metrics you might be interested in. Feel free to explore.
+
+
 
