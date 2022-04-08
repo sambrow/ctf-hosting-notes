@@ -6,7 +6,7 @@ These are things we've learned about hosting CTF web challenges using Google Clo
 ## Requirements/Limitations
 - The challenge must be a web application.
 - This technique does not support arbitrary protocols/ports.
-- Your web application can listen on any port internally but it will be exposed to the Internet on port 443 via `https://`.
+- Your web application can listen on any ports internally but only one internal port can be exposed to the Internet on port 443 via `https://`.
 - The challenge must be containerized as a Docker image.
 - You must have a google cloud account.
 - You must install the gcloud command line tooling.
@@ -107,7 +107,7 @@ Run this command:
 
 `npm install`
 
-`npm` is part of nodejs.  This will study package.json and download the express library and its dependencies into a folder named `node_modules` (which will be created).
+`npm` is part of nodejs.  This will study package.json (actually package-lock.json) and download the express library and its dependencies into a folder named `node_modules` (which will be created).
 
 You might see output like this:
 
@@ -274,7 +274,7 @@ Now that we have created an image, we can run it.  This will create a container 
   - this mainly drives home the point that you have to specify both an external and internal port or else no traffic will reach your application
 - `--name fun-app` names the newly-created container `fun-app`
   - if you don't specify a name, docker will make up one for you
-- `my-first-web-challenge:1.0` the image name and tag 
+- `my-first-web-challenge:1.0` the image name and tag used to create the container
 
 Again you should see output like:
 
@@ -361,7 +361,7 @@ Run this command to "tag" the image as being associated with your GCP project.
 
 The syntax here is:
 
-docker tag <local-image-name>:<local-image-tag> gcr.io/<your-gcp-project-identifier>/<local-image-name>:<local-image-tag>
+`docker tag <local-image-name>:<local-image-tag> gcr.io/<your-gcp-project-identifier>/<local-image-name>:<local-image-tag>`
 
 This should run immediately and produce no output.
 
@@ -529,7 +529,7 @@ This will display some in-progress status as it does the work:
 
 Internally, it will create an instance of your challenge and verify that it is actually listening on the port (8000) that you specified.
 
-If there is any issue, you'll see an explanatory error,
+If there is any issue, you'll see an explanatory error.
 
 After it finishes, you'll see something like this:
 
