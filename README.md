@@ -686,4 +686,10 @@ If you have multiple web challenges, traffic for all of them will appear in this
 There are MANY other metrics you might be interested in. Feel free to explore.
 
 
+# Real world CTF Challenge Examples
+
+Please see this repo to get a feel for some bash automation that I built around gcloud for the Web challenges I wrote for one of our team CTFs:
+
+[https://github.com/sambrow/wolvsec_ctf_2022](https://github.com/sambrow/wolvsec_ctf_2022)
+
 
