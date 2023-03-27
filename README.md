@@ -1,7 +1,7 @@
 # How to Host CTF Web Challenges
 
 
-These are things we've learned about hosting CTF web challenges using Google Cloud Run on Google Cloud Platform (GCP).
+These are things I've learned about hosting CTF web challenges using Google Cloud Run on Google Cloud Platform (GCP).
 
 ## Requirements/Limitations
 - The challenge must be a web application.
@@ -29,7 +29,7 @@ These are things we've learned about hosting CTF web challenges using Google Clo
   - Inside such a "project" is where you will do everything related to your CTF challenge hosting.
   - You can create multiple projects if you like, but the things you do inside one will not affect or be seen by the other. 
 - [Install the gcloud CLI (command line interface)](https://cloud.google.com/sdk/docs/install) onto your computer.
-  - As we progress in the instructions, you'll see that you can often set up something in GCP just by using the Web UI.  However, it is well worth getting used to the gcloud CLI since it allows for easier automation such as with bash scripts. 
+  - As you progress in the instructions, you'll see that you can often set up something in GCP just by using the Web UI.  However, it is well worth getting used to the gcloud CLI since it allows for easier automation such as with bash scripts. 
   - At some point you'll run `gloud init`.  This is where you will:
     - authenticate gcloud so that it has permissions to "talk to" your GCP project
     - select which "project" you want gcloud to talk to by default (it is easy to switch between projects and even between multiple google accounts if needed)
@@ -96,7 +96,7 @@ console.log('Local server running on port: ' + port);
 </html>
 ```
 
-We won't be teaching you how to use node or the express library but there are 
+I won't be teaching you how to use node or the express library but there are 
 lots of great resources online.
 
 ### Run the Challenge Locally (without Docker)
@@ -153,7 +153,7 @@ In order to containerize our challenge application, we'll need a `Dockerfile`.
 
 [Dockerfile]
 ```
-FROM node:12
+FROM node:19
 
 RUN mkdir -p /ctf/app
 WORKDIR /ctf/app
@@ -207,50 +207,38 @@ The `.` at the end tells it to study the `Dockerfile` in the current directory.
 You might get output like this:
 
 ```
-[+] Building 48.3s (13/13) FINISHED
- => [internal] load build definition from Dockerfile                                                                                                                                                                         0.0s
- => => transferring dockerfile: 243B                                                                                                                                                                                         0.0s
- => [internal] load .dockerignore                                                                                                                                                                                            0.0s
- => => transferring context: 119B                                                                                                                                                                                            0.0s
- => [internal] load metadata for docker.io/library/node:12                                                                                                                                                                   1.5s
- => [1/8] FROM docker.io/library/node:12@sha256:461c7f8b5e042fa7f47620cbee7772e76ce3fa0891edaab29bf7ebf0e84b9a1a                                                                                                            42.4s
- => => resolve docker.io/library/node:12@sha256:461c7f8b5e042fa7f47620cbee7772e76ce3fa0891edaab29bf7ebf0e84b9a1a                                                                                                             0.0s
- => => sha256:543479162c86f09f3dd624d4b79bc52861431a62fd96eb2ee0727c395cc0d99e 7.69kB / 7.69kB                                                                                                                               0.0s
- => => sha256:0030cc4ce25ce472fe488839def15ec8f2227bb916461b518cf534073c019a86 45.43MB / 45.43MB                                                                                                                             8.4s
- => => sha256:461c7f8b5e042fa7f47620cbee7772e76ce3fa0891edaab29bf7ebf0e84b9a1a 776B / 776B                                                                                                                                   0.0s
- => => sha256:7aeb3a7feab20a6e4e38c3d4745977ce2cd4dec48c84612b1617f0813065f617 2.21kB / 2.21kB                                                                                                                               0.0s
- => => sha256:7ab54d469df647484a8ae344911382d9b4412045d3c0f6536e7442858952cc68 11.30MB / 11.30MB                                                                                                                             2.2s
- => => sha256:0c84a1692804545a237be30579f35e501652cab9a2d8babe2693e66e653c706f 4.34MB / 4.34MB                                                                                                                               1.5s
- => => sha256:628acdaf85032c817e9eb7f4749b887f3733c8c590d2e3c2f396f2051406557f 49.77MB / 49.77MB                                                                                                                            13.1s
- => => sha256:cd55abb6ddd3a9acde3855d39958c460e6fa36b3008d6a6206408c133ab96427 214.47MB / 214.47MB                                                                                                                          31.0s
- => => sha256:561384047eedda5a3ac1d331766ef6303c5154f1a759b63e27ac93e0c12721c9 4.19kB / 4.19kB                                                                                                                               8.5s
- => => extracting sha256:0030cc4ce25ce472fe488839def15ec8f2227bb916461b518cf534073c019a86                                                                                                                                    2.1s
- => => sha256:0108341960c8b322c6e8fbad210fc42ef2e725b01b6d249fb171b054f3a3dfe2 23.70MB / 23.70MB                                                                                                                            13.1s
- => => extracting sha256:7ab54d469df647484a8ae344911382d9b4412045d3c0f6536e7442858952cc68                                                                                                                                    0.4s
- => => extracting sha256:0c84a1692804545a237be30579f35e501652cab9a2d8babe2693e66e653c706f                                                                                                                                    0.2s
- => => sha256:c230c13456fd6acc4074095364629904055974f15859a636e4b02d673dcaf903 2.34MB / 2.34MB                                                                                                                              13.7s
- => => sha256:6a4a51acaaf962d42394bbf97f28e5a8d30e001b2642d8151cabe925e3e10b5c 463B / 463B                                                                                                                                  13.4s
- => => extracting sha256:628acdaf85032c817e9eb7f4749b887f3733c8c590d2e3c2f396f2051406557f                                                                                                                                    2.4s
- => => extracting sha256:cd55abb6ddd3a9acde3855d39958c460e6fa36b3008d6a6206408c133ab96427                                                                                                                                    8.6s
- => => extracting sha256:561384047eedda5a3ac1d331766ef6303c5154f1a759b63e27ac93e0c12721c9                                                                                                                                    0.1s
- => => extracting sha256:0108341960c8b322c6e8fbad210fc42ef2e725b01b6d249fb171b054f3a3dfe2                                                                                                                                    1.5s
- => => extracting sha256:c230c13456fd6acc4074095364629904055974f15859a636e4b02d673dcaf903                                                                                                                                    0.1s
- => => extracting sha256:6a4a51acaaf962d42394bbf97f28e5a8d30e001b2642d8151cabe925e3e10b5c                                                                                                                                    0.0s
- => [internal] load build context                                                                                                                                                                                            0.0s
- => => transferring context: 32.80kB                                                                                                                                                                                         0.0s
- => [2/8] RUN mkdir -p /ctf/app                                                                                                                                                                                              0.9s
- => [3/8] WORKDIR /ctf/app                                                                                                                                                                                                   0.0s
- => [4/8] COPY ./package.json ./                                                                                                                                                                                             0.0s
- => [5/8] COPY ./package-lock.json ./                                                                                                                                                                                        0.0s
- => [6/8] RUN npm install                                                                                                                                                                                                    3.1s
- => [7/8] COPY ./index.js ./                                                                                                                                                                                                 0.0s
- => [8/8] COPY ./index.html ./                                                                                                                                                                                               0.0s
- => exporting to image                                                                                                                                                                                                       0.1s
- => => exporting layers                                                                                                                                                                                                      0.1s
- => => writing image sha256:4cc2c043a3814c31034c75f215ec5184e1df86bc91462dacc71d32d008b9470e                                                                                                                                 0.0s
- => => naming to docker.io/library/my-first-web-challenge:1.0                                                                                                                                                                0.0s
-
-Use 'docker scan' to run Snyk tests against images to find vulnerabilities and learn how to fix them
+[+] Building 11.8s (13/13) FINISHED
+ => [internal] load build definition from Dockerfile                                                                                                                                             0.0s
+ => => transferring dockerfile: 243B                                                                                                                                                             0.0s
+ => [internal] load .dockerignore                                                                                                                                                                0.0s
+ => => transferring context: 119B                                                                                                                                                                0.0s
+ => [internal] load metadata for docker.io/library/node:19                                                                                                                                       1.4s
+ => [1/8] FROM docker.io/library/node:19@sha256:2405a991a6d9f6ac1d991feefc0a4539d5187abd2ca532fd18f7185c98b32a45                                                                                 7.8s
+ => => resolve docker.io/library/node:19@sha256:2405a991a6d9f6ac1d991feefc0a4539d5187abd2ca532fd18f7185c98b32a45                                                                                 0.0s
+ => => sha256:6fefd22bacd949d1b8d83d84b45262807b5866a39391812d5a4cf8faa06e5dff 46.21MB / 46.21MB                                                                                                 4.9s
+ => => sha256:b29db415cb2e17747a71b0e0a933e80ede0c6cb9a9b14bb778b62274ad051324 2.28MB / 2.28MB                                                                                                   1.1s
+ => => sha256:ac779c6d4c57ce066a8b14043f5f0e3c9542b10a26340d2b29af95dd3815a06f 7.56kB / 7.56kB                                                                                                   0.0s
+ => => sha256:2405a991a6d9f6ac1d991feefc0a4539d5187abd2ca532fd18f7185c98b32a45 1.21kB / 1.21kB                                                                                                   0.0s
+ => => sha256:3521b8b34fe48d6557b934b6a9c42d0a92b87ee32de0aac13f37ebbfc77c1ca2 2.21kB / 2.21kB                                                                                                   0.0s
+ => => sha256:4f4cf292bc62eeea8a34b4160f3ef1f335b6b7b2bb9d28c605dc4002c8a24bc2 4.21kB / 4.21kB                                                                                                   0.1s
+ => => extracting sha256:4f4cf292bc62eeea8a34b4160f3ef1f335b6b7b2bb9d28c605dc4002c8a24bc2                                                                                                        0.0s
+ => => sha256:adc76471ff8a23a6b5a33c3e2bf508d54d85901b34e02c7df9a8430bf65b0ce5 455B / 455B                                                                                                       0.4s
+ => => extracting sha256:6fefd22bacd949d1b8d83d84b45262807b5866a39391812d5a4cf8faa06e5dff                                                                                                        2.4s
+ => => extracting sha256:b29db415cb2e17747a71b0e0a933e80ede0c6cb9a9b14bb778b62274ad051324                                                                                                        0.1s
+ => => extracting sha256:adc76471ff8a23a6b5a33c3e2bf508d54d85901b34e02c7df9a8430bf65b0ce5                                                                                                        0.0s
+ => [internal] load build context                                                                                                                                                                0.0s
+ => => transferring context: 39.70kB                                                                                                                                                             0.0s
+ => [2/8] RUN mkdir -p /ctf/app                                                                                                                                                                  0.4s
+ => [3/8] WORKDIR /ctf/app                                                                                                                                                                       0.0s
+ => [4/8] COPY ./package.json ./                                                                                                                                                                 0.0s
+ => [5/8] COPY ./package-lock.json ./                                                                                                                                                            0.0s
+ => [6/8] RUN npm install                                                                                                                                                                        1.8s
+ => [7/8] COPY ./index.js ./                                                                                                                                                                     0.0s
+ => [8/8] COPY ./index.html ./                                                                                                                                                                   0.0s
+ => exporting to image                                                                                                                                                                           0.1s
+ => => exporting layers                                                                                                                                                                          0.1s
+ => => writing image sha256:c7394a83723321b4b1f9524330a059a0fd8f3b43e3de231823c62649310cbdfb                                                                                                     0.0s
+ => => naming to docker.io/library/my-first-web-challenge:1.0
 ```
 
 We can now ask docker to list all the images and this one should now be included in the list output.
@@ -306,48 +294,74 @@ To stop the application, you can use the Docker Dashboard UI or run this command
 **Note**: You might be able to stop the application by pressing `Control+C` in the terminal window you used to start it. However, I'm not certain this is guaranteed to always work.
 
 
-## Deploy the Image to Google Container Registry
+## Deploy the Image to Google Artifact Registry
 
-We now want to upload our Docker image into Google Container Registry.
+We now want to upload our Docker image into Google Artifact Registry.
 
-### Container Registry Web UI
+**Note**: You could also use Container Registry but Google seems to be downplaying that in favor of Artifact Registry.
+
+### Artifact Registry Web UI
 
 The menu on the left of the GCP web UI has lots of items.  Just keep scrolling down until you find it here:
 
-![img.png](media/container-registry-menu.png)
+![img.png](media/artifact-registry-menu.png)
 
-We recommend pinning that item so it'll appear for you at the top of the menu.
+I recommend pinning that item so it'll appear for you at the top of the menu.
 
-When you click it, you'll see a page like this with no items in the table yet.
+When you click it, you'll likely see a page like this telling you that you have to enable the associated API:
 
-![img.png](media/container-registry-page-no-items.png)
+![img.png](media/artifact-registry-enable-api.png)
 
-### Allow docker to "push" to Container Registry
+Go ahead and enable it and you'll see a page like this with no items in the table yet.
 
-In order to get our web docker image into Google Container Registry we need to setup docker to be allowed to "push" to it.
+![img.png](media/artifact-registry-empty.png)
 
-[These instructions](https://cloud.google.com/container-registry/docs/advanced-authentication#gcloud-helper) will help you.
+Now click **CREATE REPOSITORY**
+
+And fill it out something like this:
+
+![artifact-registry-create-repository](./media/artifact-registry-create-repository.png)
+
+Then click CREATE at the bottom and you should see something like this:
+
+![artifact-registry-create-repository](./media/artifact-registry-not-empty.png)
+
+If you click on the **locker** link you'll see an empty repository:
+
+![artifact-registry-create-repository](./media/artifact-registry-locker-empty.png)
+
+
+
+### Allow docker to "push" to Artifact Registry repository
+
+In order to get our web docker image into Google Artifact Registry we need to setup docker to be allowed to "push" to it.
+
+[These instructions](https://cloud.google.com/artifact-registry/docs/docker/authentication#gcloud-helper) will help you.
 
 First run this: `gcloud auth login`
 
 This will open the browser and allow you to select the google account you want to use.  It'll then ask you to confirm the permissions that gcloud needs.
 
-Next run this: `gcloud auth configure-docker`
+Next run a command like this: `gcloud auth configure-docker <your-region>-docker.pkg.dev`
+
+where `<your-region>` is replaced by whatever region you picked earlier.
+
+In this case it would be: `gcloud auth configure-docker us-east5-docker.pkg.dev` 
 
 This will setup docker to be able to push to your project's container registry.  You might see output like:
 
 ```
-{
+Adding credentials for: us-east5-docker.pkg.dev
+After update, the following will be written to your Docker config file located at [/Users/sambrow/.docker/config.json]:
+ {
   "credHelpers": {
-    "gcr.io": "gcloud",
-    "us.gcr.io": "gcloud",
-    "eu.gcr.io": "gcloud",
-    "asia.gcr.io": "gcloud",
-    "staging-k8s.gcr.io": "gcloud",
-    "marketplace.gcr.io": "gcloud"
+    "us-east5-docker.pkg.dev": "gcloud"
   }
 }
-Adding credentials for all GCR repositories.
+
+Do you want to continue (Y/n)?  Y
+
+Docker configuration file updated.
 ```
 
 You'll notice the above content in your `~/.docker/config.json` file.
@@ -357,70 +371,64 @@ You'll notice the above content in your `~/.docker/config.json` file.
 
 Run this command to "tag" the image as being associated with your GCP project.
 
-`docker tag my-first-web-challenge:1.0 gcr.io/thermal-wonder-338201/my-first-web-challenge:1.0`
+`docker tag my-first-web-challenge:1.0 us-east5-docker.pkg.dev/my-first-project-381423/locker/my-first-web-challenge:1.0`
 
 The syntax here is:
 
-`docker tag <local-image-name>:<local-image-tag> gcr.io/<your-gcp-project-identifier>/<local-image-name>:<local-image-tag>`
+`docker tag <local-image-name>:<local-image-tag> <your-region>-docker.pkg.dev/<your-gcp-project-identifier>/<local-image-name>:<local-image-tag>`
 
 This should run immediately and produce no output.
 
 To verify it actually did something run: `docker images`
 
-You'll see something like:
+and you should see an new entry.
 
-```
-REPOSITORY                                            TAG       IMAGE ID       CREATED        SIZE
-my-first-web-challenge                                1.0       4cc2c043a381   22 hours ago   920MB
-gcr.io/thermal-wonder-338201/my-first-web-challenge   1.0       4cc2c043a381   22 hours ago   920MB
-```
+Now we can ask docker to "push" this image to Google Artifact Registry:
 
-Now we can ask docker to "push" this image to Google Container Registry:
-
-`docker push gcr.io/thermal-wonder-338201/my-first-web-challenge:1.0`
+`docker push us-east5-docker.pkg.dev/my-first-project-381423/locker/my-first-web-challenge:1.0`
 
 You might see output like this:
 
 ````
-The push refers to repository [gcr.io/thermal-wonder-338201/my-first-web-challenge]
-0e4e990a5801: Pushed
-e46d8f847897: Pushed
-6028c55a5a49: Pushed
-c794aac0a94c: Pushed
-87dc0d8d7ee7: Pushed
+The push refers to repository [us-east5-docker.pkg.dev/my-first-project-381423/locker/my-first-web-challenge]
+deafc041a779: Pushed
+c561844c2548: Pushed
+f22997732bf8: Pushed
+21c4b65059ee: Pushed
+3059e6198f70: Pushed
 5f70bf18a086: Layer already exists
-50ed79383d91: Pushed
-cba7f369883f: Layer already exists
-46b21d2f25ec: Layer already exists
-0fb7df40bb5b: Layer already exists
-c26a5692b560: Layer already exists
-0cd41aa80b1f: Layer already exists
-7a6d0f54488f: Layer already exists
-6ef8823b489f: Layer already exists
-9578c16f3f7c: Layer already exists
-3141322c5cdb: Layer already exists
-1.0: digest: sha256:0ce5d03ccd5309e28c212348a74e3bc7f438881a16baeedf5398b0c0a0902570 size: 3668
+1cdf5968ef7a: Pushed
+3dead16a7183: Pushed
+be05630b36e9: Pushed
+2d6abd2a74fb: Pushed
+e64d92eb4ecd: Pushed
+ac504d030134: Pushed
+52ebb9a789db: Pushed
+86d774dafc20: Pushed
+da68f13652fc: Pushed
+cf2e8433dbf2: Pushed
+1.0: digest: sha256:fb3153d147042dea6e65d3afb4bb2c0f386a1c2837f7616b2103a38dff0789f7 size: 3668
 ````
 
-### Viewing the Image in Container Registry
+### Viewing the Image in Artifact Registry
 
-If you refresh your Container Registry web page, you should now see your pushed iage:
+If you refresh your Artifact Registry web page, you should now see your pushed image:
 
-![](media/container-registry-page-one-item.png)
+![](media/artifact-registry-locker-not-empty.png)
 
 If you click on the image name, you are brought to a detail page like this:
 
-![](media/container-registry-drill.png)
+![](media/artifact-registry-locker-image-drill.png)
 
-**Note**: You can build newer images with updated tags like `1.1` or `2.0` and run through the above steps with them as well.  They'll appear as new rows inside the details page for that image.
+**Note**: You can build newer images with the same tag (or updated tags like `1.1` or `2.0`) and run through the above steps with them as well.  They'll appear as new rows inside the details page for that image.
 
 ## Creating your first Google Cloud Run Service
 
-Now that we have an image uploaded to Container Registry, we can create our first real web application inside Cloud Run.
+Now that we have an image uploaded to Artifact Registry, we can create our first real web application inside Cloud Run.
 
 First we'll do it via the web ui and later learn how to do it using the gcloud CLI.
 
-Find the Cloud Run menu item in the large menu on the left.  Again, we suggest pinning it so it stays at the top.
+Find the Cloud Run menu item in the large menu on the left.  Again, I suggest pinning it so it stays at the top.
 
 ![](media/cloud-run-menu.png)
 
@@ -434,7 +442,7 @@ The first item we specify is the image/revision we want to use.  Click the SELEC
 
 ![](media/create-service-select.png)
 
-A list of your items from the Container Registry will appear on the right. Select the one you want:
+A list of your items from the Artifact Registry will appear on the right. Select the one you want:
 
 ![](media/create-service-image-selected.png)
 
@@ -454,17 +462,14 @@ Some minor notes on these items:
   - When nobody is accessing your challenge Google will spin down all your instances to save money/resources.
   - If your challenge starts getting traffic, it will spin some back up.
   - If it gets a LOT of traffic, it will spin up even more instances.  It has a default heuristic that is fine but you can teak it as you'll see later.
-  - If you have a web challenge where the timing of the request/response is important, you might consider setting min and max to the same value.
-  - We had a couple challenges like this and set min = max = 10.  This ensures no users will see the delay caused by Cloud Run spinning up a new instance.
-- Ingress:
-  - Allow all traffic
-  - not sure when you'd use the other choices here
+  - I recommend, setting min to be >= 1 so that there is always at least one "alive" to avoid spin up delays.
+  - If you have a web challenge where the timing of the request/response is important, you might consider setting min and max to the same value.  This will cost more (but likely not much) but will avoid the latency of spinning up a new instance.
 - Authentication
   - Allow unauthenticated invocations
   - That's exactly what we want for a CTF challenge.
 
 
-At the bottom is a **Containers, Variables & Secrets, Connections, Security** section.  Expand this.
+At the bottom is a **Container, Networking, Security** section.  Expand this.
 
 The default connection port is `8080` and you'll want to change it to be `8000` for this example.
 
@@ -476,10 +481,10 @@ Next you enter the **Capacity** details:
 
 ![](media/create-service-capacity.png)
 
-For most CTF web challenges I can think of you can likely go with the defaults.
+For a low-resource web challenges, you can likely go with the defaults.
 I did increase the memory and CPUs in a challenge that used Puppeteer to invoke a headless version of Chrome.
 
-We suggest you test out your challenge under some reasonable load to ensure you won't be surprised when your CTF opens.  Such testing is outside the scope of this document.
+I suggest you test out your challenge under some reasonable load to ensure you won't be surprised when your CTF opens.  Such testing is outside the scope of this document.
 
 Here is where you can tweak the **Max requests per container**.
 
@@ -508,13 +513,12 @@ Save that command line away for later reference:
 
 ```
 gcloud run deploy my-first-web-challenge \
---image=gcr.io/thermal-wonder-338201/my-first-web-challenge@sha256:0ce5d03ccd5309e28c212348a74e3bc7f438881a16baeedf5398b0c0a0902570 \
+--image=us-east5-docker.pkg.dev/my-first-project-381423/locker/my-first-web-challenge@sha256:fb3153d147042dea6e65d3afb4bb2c0f386a1c2837f7616b2103a38dff0789f7 \
 --allow-unauthenticated \
 --port=8000 \
---service-account=726894497722-compute@developer.gserviceaccount.com \
---platform=managed \
---region=us-central1 \
---project=thermal-wonder-338201
+--service-account=395449254548-compute@developer.gserviceaccount.com \
+--region=us-east5 \
+--project=my-first-project-381423
 ```
 
 Notice that since we mostly took the defaults, there are not that many options.  If we had varied from the defaults, this command line would then specify more things.
@@ -538,24 +542,24 @@ After it finishes, you'll see something like this:
 
 Notice at the top there is a **URL** for your app like: 
 
-[https://my-first-web-challenge-znhlm3c47a-uc.a.run.app/](https://my-first-web-challenge-znhlm3c47a-uc.a.run.app/)
+https://my-first-web-challenge-to3hkfmw4q-ul.a.run.app
 
 You can see this link uses `https://`.  There is no support for `http://`.
 
-Also notice the domain name starts with the name of your image.
+Also notice the domain name starts with the name of your service.
 
 The remainder of the domain name is some unique characters followed by the rest of the domain.
 
 This URL will remain stable as long as you keep the same docker image name.  The unique part is specific to your current project.
 
-If you push another web challenge image with a different name and create a Cloud Run service from it, you'll get a similar-looking URL that starts with that image's name and the rest will be identical to your first URL.
+If you create another Cloud Run service with a different service name, you'll get a similar-looking URL that starts with that service's name and the rest will be identical to your first URL.
 
 Let's click the link and see our app!
 
 ![](media/my-first-web-challenge-in-cloud-run.png)
 
 
-## Reminder about session and instances
+## Notes about sessions and instances
 
 Cloud Run will route incoming requests to your application and spin up new instances as needed if the load becomes heavy.
 
@@ -563,13 +567,15 @@ A naive approach at keeping session state in a global variable will fail since t
 
 You might think you could set min = max = 1 and THEN use global variables to manage some kind of session state.
 
-This would also be dangerous since Cloud Run is free to spin down your instance and spin up a new one in its place any time it likes.
+This would likely work ok in practice but could be dangerous since Cloud Run is free to spin down your instance and spin up a new one in its place any time it likes.
 
 If your challenge does need session state, a good first try is to manage it in client-side cookies using something like JWT (JSON Web Token).
 
 The details are beyond the scope of this article.
 
-If you need "real" session storage, it is possible to get a Cloud Run application to talk to a REDIS instance.
+In the **Container, Networking, Security** section, under **Networking**, there is an option for **Session affinity**. This will assign a cookie to the browser on its first visit to your challenge and the load balancer will try to route to the same instance every time.  For various reasons, it might not be able to but this should work ok in practice.
+
+If you need "real" session storage shared across all instances, it is possible to get a Cloud Run application to talk to a REDIS instance.
 
 Here is at least [one article](https://medium.com/google-cloud/using-memorystore-with-cloud-run-82e3d61df016) that might help you.
 
@@ -578,7 +584,7 @@ Here is at least [one article](https://medium.com/google-cloud/using-memorystore
 
 To stop the web challenge, you need to select it in the Services web page and then click the DELETE icon at the top.
 
-As far as we know, there is no "pause service" feature.
+As far as I know, there is no "pause service" feature.
 
 To start it again, you can repeat the earlier steps to create the service over again.  If you use the same image from the Container Registry, your challenge URL will be unchanged.
 
@@ -591,13 +597,12 @@ In an earlier step, you saved off the command line to create a service.  If you 
 
 ```
 gcloud run deploy my-first-web-challenge \
---image=gcr.io/thermal-wonder-338201/my-first-web-challenge@sha256:0ce5d03ccd5309e28c212348a74e3bc7f438881a16baeedf5398b0c0a0902570 \
+--image=us-east5-docker.pkg.dev/my-first-project-381423/locker/my-first-web-challenge@sha256:fb3153d147042dea6e65d3afb4bb2c0f386a1c2837f7616b2103a38dff0789f7 \
 --allow-unauthenticated \
 --port=8000 \
---service-account=726894497722-compute@developer.gserviceaccount.com \
---platform=managed \
---region=us-central1 \
---project=thermal-wonder-338201
+--service-account=395449254548-compute@developer.gserviceaccount.com \
+--region=us-east5 \
+--project=my-first-project-381423
 ```
 
 
@@ -609,19 +614,19 @@ possible output:
 
 ```
    SERVICE                 REGION       URL                                                     LAST DEPLOYED BY    LAST DEPLOYED AT
-✔  my-first-web-challenge  us-central1  https://my-first-web-challenge-znhlm3c47a-uc.a.run.app  ????????@gmail.com  2022-04-04T23:50:44.869891Z
+✔  my-first-web-challenge  us-east5     https://my-first-web-challenge-to3hkfmw4q-ul.a.run.app  ????????@gmail.com  2023-03-27T23:50:44.869891Z
 ```
 
 
 To delete a running Service:
 
-`gcloud run services delete my-first-web-challenge --region=us-central1 --project=thermal-wonder-338201`
+`gcloud run services delete my-first-web-challenge --region=us-east5 --project=my-first-project-381423`
 
 This will ask for confirmation.
 
 If you want it to just do it without confirming, you can add the `-q` option.
 
-`gcloud run services delete my-first-web-challenge -q --region=us-central1 --project=thermal-wonder-338201`
+`gcloud run services delete my-first-web-challenge -q --region=us-east5 --project=my-first-project-381423`
 
 
 If you are working with a group of web challenges, it is likely best to setup shell scripts:
@@ -632,7 +637,7 @@ If you are working with a group of web challenges, it is likely best to setup sh
 
 ## Solvers
 
-We strongly recommend creating solvers for your web challenges.  We usually do this in python using the requests package to make http requests.
+I strongly recommend creating solvers for your web challenges.  I usually do this in python using the requests package to make http requests.
 
 You can then create another shell script that runs all your solvers to prove your challenges are all in a good state.
 
@@ -684,12 +689,4 @@ Using this web UI, you can change the interval of time shown in your widget.
 If you have multiple web challenges, traffic for all of them will appear in this one widget where each challenge is a different color.
 
 There are MANY other metrics you might be interested in. Feel free to explore.
-
-
-# Real world CTF Challenge Examples
-
-Please see this repo to get a feel for some bash automation that I built around gcloud for the Web challenges I wrote for one of our team CTFs:
-
-[https://github.com/sambrow/wolvsec_ctf_2022](https://github.com/sambrow/wolvsec_ctf_2022)
-
 

@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:19
 
 RUN mkdir -p /ctf/app
 WORKDIR /ctf/app
