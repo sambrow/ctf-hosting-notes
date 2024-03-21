@@ -1,0 +1,17 @@
+version: "2.2"
+
+# This is for local dev/testing only
+
+services:
+  service-manager:
+    build: .
+    image: service-manager:1.0
+    environment:
+      # This is for local testing. It does NOT become part of the image we build
+      # and upload to gcloud.
+      BA_PASSWORD: secretstuff
+    container_name: service-manager
+    init: true
+    restart: always
+    ports:
+      - 5000:5000

@@ -1,7 +1,10 @@
 # How to Host CTF Web Challenges
 
-
 These are things I've learned about hosting CTF web challenges using Google Cloud Run on Google Cloud Platform (GCP).
+
+## UIs Change Over Time
+
+**Note added (years) later**: Some of the screenshots below differ slightly from the current web UI, but the general concepts remain the same.
 
 ## Requirements/Limitations
 - The challenge must be a web application.
@@ -36,7 +39,7 @@ These are things I've learned about hosting CTF web challenges using Google Clou
 
 For this tutorial, I created this project:
 
-![](media/gcp-project-page.png)
+![](assets/gcp-project-page.png)
 
 ## My First Web Challenge
 
@@ -122,7 +125,7 @@ found 0 vulnerabilities
 
 And now you'll notice a `node_modules` folder has been created.
 
-**Note**: You should always add `node_modules` to a .gitignore file in your git repository.  This will prevent the contents of this folder from being added to source control.
+**Note**: You should always add `node_modules` to a `.gitignore` file in your git repository.  This will prevent the contents of this folder from being added to source control.
 
 We can now run the application:
 
@@ -139,11 +142,11 @@ Now if you open your web browser to this link:
 
 and you should see something like:
 
-![img.png](media/my-first-web-challenge-app.png)
+![img.png](assets/my-first-web-challenge-app.png)
 
 Of course, if you right-click inside the page and select View Page Source you'll see the flag:
 
-![img.png](media/my-first-web-challenge-view-source.png)
+![img.png](assets/my-first-web-challenge-view-source.png)
 
 You can press `Control+C` in the terminal window to stop the application.
 
@@ -304,31 +307,31 @@ We now want to upload our Docker image into Google Artifact Registry.
 
 The menu on the left of the GCP web UI has lots of items.  Just keep scrolling down until you find it here:
 
-![img.png](media/artifact-registry-menu.png)
+![img.png](assets/artifact-registry-menu.png)
 
 I recommend pinning that item so it'll appear for you at the top of the menu.
 
 When you click it, you'll likely see a page like this telling you that you have to enable the associated API:
 
-![img.png](media/artifact-registry-enable-api.png)
+![img.png](assets/artifact-registry-enable-api.png)
 
 Go ahead and enable it and you'll see a page like this with no items in the table yet.
 
-![img.png](media/artifact-registry-empty.png)
+![img.png](assets/artifact-registry-empty.png)
 
 Now click **CREATE REPOSITORY**
 
 And fill it out something like this:
 
-![artifact-registry-create-repository](./media/artifact-registry-create-repository.png)
+![artifact-registry-create-repository](./assets/artifact-registry-create-repository.png)
 
 Then click CREATE at the bottom and you should see something like this:
 
-![artifact-registry-create-repository](./media/artifact-registry-not-empty.png)
+![artifact-registry-create-repository](./assets/artifact-registry-not-empty.png)
 
 If you click on the **locker** link you'll see an empty repository:
 
-![artifact-registry-create-repository](./media/artifact-registry-locker-empty.png)
+![artifact-registry-create-repository](./assets/artifact-registry-locker-empty.png)
 
 
 
@@ -414,11 +417,11 @@ cf2e8433dbf2: Pushed
 
 If you refresh your Artifact Registry web page, you should now see your pushed image:
 
-![](media/artifact-registry-locker-not-empty.png)
+![](assets/artifact-registry-locker-not-empty.png)
 
 If you click on the image name, you are brought to a detail page like this:
 
-![](media/artifact-registry-locker-image-drill.png)
+![](assets/artifact-registry-locker-image-drill.png)
 
 **Note**: You can build newer images with the same tag (or updated tags like `1.1` or `2.0`) and run through the above steps with them as well.  They'll appear as new rows inside the details page for that image.
 
@@ -430,27 +433,27 @@ First we'll do it via the web ui and later learn how to do it using the gcloud C
 
 Find the Cloud Run menu item in the large menu on the left.  Again, I suggest pinning it so it stays at the top.
 
-![](media/cloud-run-menu.png)
+![](assets/cloud-run-menu.png)
 
 Open the Cloud Run web ui and you'll see you have no Services defined yet:
 
-![](media/cloud-run-page-empty.png)
+![](assets/cloud-run-page-empty.png)
 
 Start defining a service by clicking the **CREATE SERVICE** link.
 
 The first item we specify is the image/revision we want to use.  Click the SELECT link here:
 
-![](media/create-service-select.png)
+![](assets/create-service-select.png)
 
 A list of your items from the Artifact Registry will appear on the right. Select the one you want:
 
-![](media/create-service-image-selected.png)
+![](assets/create-service-image-selected.png)
 
 For the next several choices, we'll accept the defaults.
 
 However, we have to decide whether to allow unauthenticated access.  For a CTF, that is exactly what we want:
 
-![](media/create-service-first-several-items.png)
+![](assets/create-service-first-several-items.png)
 
 Some minor notes on these items:
 
@@ -473,13 +476,13 @@ At the bottom is a **Container, Networking, Security** section.  Expand this.
 
 The default connection port is `8080` and you'll want to change it to be `8000` for this example.
 
-![](media/create-service-container-port.png)
+![](assets/create-service-container-port.png)
 
 You can leave the next couple fields blank.
 
 Next you enter the **Capacity** details:
 
-![](media/create-service-capacity.png)
+![](assets/create-service-capacity.png)
 
 For a low-resource web challenges, you can likely go with the defaults.
 I did increase the memory and CPUs in a challenge that used Puppeteer to invoke a headless version of Chrome.
@@ -494,7 +497,7 @@ Again, I've only reduced this in the case where the challenge invoked a headless
 
 Finally, select your desired **Execution environment**
 
-![](media/create-service-execution-environment.png)
+![](assets/create-service-execution-environment.png)
 
 I think most web challenges will do fine with the "First generation".
 
@@ -507,7 +510,7 @@ Before you click **CREATE** to create your first Cloud Run Service, take a momen
 
 Go ahead and click that and you'll see:
 
-![](media/create-service-show-command-line.png)
+![](assets/create-service-show-command-line.png)
 
 Save that command line away for later reference:
 
@@ -529,7 +532,7 @@ Ok, now dismiss the pane on the right and click the **CREATE** button.
 
 This will display some in-progress status as it does the work:
 
-![](media/create-service-create1.png)
+![](assets/create-service-create1.png)
 
 Internally, it will create an instance of your challenge and verify that it is actually listening on the port (8000) that you specified.
 
@@ -537,7 +540,7 @@ If there is any issue, you'll see an explanatory error.
 
 After it finishes, you'll see something like this:
 
-![](media/create-service-create2.png)
+![](assets/create-service-create2.png)
 
 
 Notice at the top there is a **URL** for your app like: 
@@ -556,7 +559,7 @@ If you create another Cloud Run service with a different service name, you'll ge
 
 Let's click the link and see our app!
 
-![](media/my-first-web-challenge-in-cloud-run.png)
+![](assets/my-first-web-challenge-in-cloud-run.png)
 
 
 ## Notes about sessions and instances
@@ -657,32 +660,32 @@ You can use the Filter feature to filter down to just lines containing specified
 
 In the GCP menu on the left, select Monitoring and then Dashboards:
 
-![](media/monitoring-dashboard-menu.png)
+![](assets/monitoring-dashboard-menu.png)
 
 Note: Before proceeding, be sure to generate "some" traffic to your challenge.  A few page loads should be enough.  By default the web UI only offers you metrics that have data.  By visiting the page, you'll generate some data for the metric we want.
 
 Click CREATE DASHBOARD:
 
-![](media/dashboard-create.png)
+![](assets/dashboard-create.png)
 
 Give your dashboard a name and then click the Line entry from the Chart Library:
 
-![](media/dashboard-set-name.png)
+![](assets/dashboard-set-name.png)
 
 Open up the **Resource & Metric** dropdown and select Cloud Run Revision:
 
-![](media/dashboard-resource-and-metric1.png)
+![](assets/dashboard-resource-and-metric1.png)
 
 From the ACTIVE METRIC CATEGORIES, select **Request_count** and then from ACTIVE METRICS select **Request Count**:
 
-![](media/dashboard-request-count.png)
+![](assets/dashboard-request-count.png)
 
 
 Then click APPLY.
 
 You should now see this widget appear in your dashboard:
 
-![](media/dashboard-widget-request-count.png)
+![](assets/dashboard-widget-request-count.png)
 
 Using this web UI, you can change the interval of time shown in your widget.
 
@@ -690,3 +693,47 @@ If you have multiple web challenges, traffic for all of them will appear in this
 
 There are MANY other metrics you might be interested in. Feel free to explore.
 
+
+
+# Private Challenge Instances
+
+## Overview
+
+In all of the above, the idea is that every contestant will be hitting the same challenge instance. Google Cloud Run might spin up multiple instances based on load but it is still true that multiple contestants will be hitting the same instance.
+
+Because of this, web challenges should be designed very carefully so that one contestant cannot spoil the challenge for everyone else. 
+
+For example, if your challenge allows RCE (remote code execution) and your challenge is not setup carefully, a contestant could alter/delete the flag file for example. This would cause all kinds of confusion during the CTF event.
+
+In the past, I've seen a few CTFs that allow you to "spin up" a private challenge instance.  These generally have a limited lifetime but can be renewed by the contestant. The obvious advantage is that the contestant cannot spoil the challenge for anyone else since they have their own private instance that, in theory, nobody else is talking to.
+
+Many of these private challenges that I've seen differ only by the port. It would be fairly easy for a malicious contestant to scan the ports to find instances in used by other teams and potentially spoil them or maybe even leverage them to get the flag without actually solving the challeng themselves.
+
+**Note**: It is best to avoid private challenge instances if possible since they complicate the hosting. If you have some string reason for private instances, then please read on to see how I did it.
+
+## Design Goals
+
+I've always wanted figure out how to host private web challenges so in 2024 I gave it a shot.
+
+My design goals were:
+
+- allow per-team (not per-contestant) private challenge instances
+- make it impossible/infeasible for one team to interact with another team's private instance
+- use the Google Cloud Run infrastruture that I was already familiar with
+- leverage CTFd's ability to write a "custom" challenge type in order to expose private challenges in the CTFd web UI
+
+
+
+**TODO: Continue here**
+
+Including some screenshots here that I'll later suround with explanatory text.
+
+
+
+![image-20240320200142485](./assets/image-20240320200142485.png)
+
+
+
+
+
+![image-20240320200720611](./assets/image-20240320200720611.png)

@@ -1,0 +1,36 @@
+{% extends "challenge.html" %}
+<!-- only renders IF some text is entered into the Connection Info field for this challenge -->
+{% block description %}
+{{ super() }}
+<div class="mb-3 text-center deployment-actions">
+    <div>This challenge can have at most one instance <b>per team</b>.</div>
+    <br/>
+    <div id="private_challenge_management">
+        <div id="private_challenge_spinner"><i class="fas fa-spin fa-spinner"></i> Determining challenge instance status. Please wait.</div>
+        <div id="private_challenge_error" hidden></div>
+        <div id="private_challenge_content" hidden>
+            <div id="private_challenge_running_details">
+                <div>
+                    This private challenge instance has about <b><span id="private_challenge_minutes_to_live">???</span></b> minutes to live.
+                    (to recompute, close/reopen this window)
+                </div>
+                <br/>
+                <div>
+                    Instance URL: <a id="private_challenge_url" href="" target="_blank"></a>
+                </div>
+                <br/>
+            </div>
+            <span>
+                <button id="private_challenge_button"
+                        onclick="deployPrivateChallenge(private_challenge_management, '{{ challenge.service_name | safe }}')"
+                        class="btn btn-primary">
+                    <small style="color:white;"><i class="fas"></i> <span id="private_challenge_button_label">Start Challenge</span></small>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>
+<!-- Ugh, not a clean way to make this call but a simple <script> doesn't work due to how this content is loaded. -->
+<img style="visibility: hidden" src=X onerror="determinePrivateChallengeStatus(private_challenge_management, '{{ challenge.service_name | safe }}')">
+
+{% endblock %}
